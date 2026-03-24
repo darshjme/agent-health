@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-health"
+version = "0.1.0"
+description = "Health checks and liveness monitoring for LLM agent systems."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+keywords = ["health", "monitoring", "agents", "llm", "liveness", "readiness"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Monitoring",
+]
+dependencies = []  # zero runtime deps
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "pytest-timeout"]
+
+[project.urls]
+Homepage = "https://github.com/your-org/agent-health"
+Repository = "https://github.com/your-org/agent-health"
+Issues = "https://github.com/your-org/agent-health/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

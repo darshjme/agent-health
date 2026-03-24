@@ -1,0 +1,280 @@
+# agent-health
+
+**Health checks and liveness monitoring for LLM agent systems.**
+
+[![Python ≥3.10](https://img.shields.io/badge/python-≥3.10-blue.svg)](https://python.org)
+[![Zero dependencies](https://img.shields.io/badge/dependencies-zero-green.svg)]()
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
+
+---
+
+## Why?
+
+Production agent systems break in subtle ways:
+- The LLM API is rate-limited but not returning errors
+- A database connection is silently stalling
+- Memory is creeping toward 100% under a long-running batch job
+- An agent loop is taking 10× longer than it should
+
+`agent-health` gives you a clean, composable, zero-dependency way to detect all of this — and expose it as a single `/health` JSON endpoint.
+
+---
+
+## Installation
+
+```bash
+pip install agent-health
+```
+
+Zero runtime dependencies. Uses only the Python standard library.
+
+---
+
+## Quick Start
+
+```python
+from agent_health import HealthRegistry, HttpCheck, DiskSpaceCheck, MemoryCheck, LatencyCheck
+import openai
+
+registry = HealthRegistry()
+
+# Is the OpenAI API reachable?
+registry.register(HttpCheck(
+    name="openai-api",
+    url="https://api.openai.com/v1/models",
+    expected_status=200,
+    timeout=5.0,
+    critical=True,
+))
+
+# Do we have enough disk for logs?
+registry.register(DiskSpaceCheck(
+    name="disk-root",
+    path="/",
+    min_free_gb=2.0,
+    critical=True,
+))
+
+# Memory under control?
+registry.register(MemoryCheck(
+    name="memory",
+    max_percent=85.0,
+    critical=False,   # degrade, don't die
+))
+
+# Is our embedding function fast enough?
+def embed(text: str):
+    # your real embedding call here
+    return [0.0] * 1536
+
+registry.register(LatencyCheck(
+    name="embed-latency",
+    func=lambda: embed("ping"),
+    max_ms=500.0,
+    critical=False,
+))
+
+# Run all checks
+health = registry.run_all(parallel=True)
+print(health.to_dict())
+```
+
+---
+
+## Flask `/health` Endpoint Example
+
+Drop this into any Flask app (or adapt to FastAPI/Starlette/etc.):
+
+```python
+from flask import Flask, jsonify
+from agent_health import HealthRegistry, HttpCheck, DiskSpaceCheck, MemoryCheck, LatencyCheck
+
+app = Flask(__name__)
+
+# --- Build the registry once at startup ---
+registry = HealthRegistry()
+
+registry.register(HttpCheck(
+    name="llm-api",
+    url="https://api.openai.com/v1/models",
+    expected_status=200,
+    timeout=4.0,
+    critical=True,
+))
+
+registry.register(DiskSpaceCheck(
+    name="disk",
+    path="/",
+    min_free_gb=1.0,
+    critical=True,
+))
+
+registry.register(MemoryCheck(
+    name="memory",
+    max_percent=90.0,
+    critical=False,
+))
+
+registry.register(LatencyCheck(
+    name="db-ping",
+    func=lambda: None,  # replace with: db.execute("SELECT 1")
+    max_ms=200.0,
+    critical=True,
+))
+
+
+# --- /health endpoint ---
+@app.route("/health")
+def health():
+    result = registry.run_all(parallel=True)
+    payload = result.to_dict()
+
+    # Map status → HTTP code:
+    # healthy   → 200
+    # degraded  → 200  (still serving, but warn)
+    # unhealthy → 503
+    http_status = 503 if result.status == "unhealthy" else 200
+    return jsonify(payload), http_status
+
+
+if __name__ == "__main__":
+    app.run(port=8080)
+```
+
+**Sample response (all healthy):**
+
+```json
+{
+  "status": "healthy",
+  "timestamp": 1711276800.0,
+  "duration_ms": 43.2,
+  "summary": {
+    "healthy": 4,
+    "degraded": 0,
+    "unhealthy": 0,
+    "total": 4
+  },
+  "checks": [
+    {
+      "name": "llm-api",
+      "status": "healthy",
+      "message": "HTTP 200 from https://api.openai.com/v1/models",
+      "duration_ms": 38.1,
+      "metadata": {"url": "https://api.openai.com/v1/models", "status_code": 200}
+    },
+    {
+      "name": "disk",
+      "status": "healthy",
+      "message": "47.30 GB free on '/'",
+      "duration_ms": 0.2,
+      "metadata": {"path": "/", "free_gb": 47.3, "total_gb": 100.0, "used_percent": 52.7, "min_free_gb": 1.0}
+    },
+    {
+      "name": "memory",
+      "status": "healthy",
+      "message": "Memory usage 61.2% (limit: 90.0%)",
+      "duration_ms": 0.4,
+      "metadata": {"total_mb": 15625.0, "used_mb": 9562.5, "available_mb": 6062.5, "used_percent": 61.2, "max_percent": 90.0}
+    },
+    {
+      "name": "db-ping",
+      "status": "healthy",
+      "message": "Latency 0.1ms (limit: 200.0ms)",
+      "duration_ms": 0.1,
+      "metadata": {"latency_ms": 0.1, "max_ms": 200.0}
+    }
+  ]
+}
+```
+
+---
+
+## Writing a Custom Check
+
+```python
+from agent_health import HealthCheck, HealthResult
+import redis
+
+class RedisCheck(HealthCheck):
+    def __init__(self, name: str, host: str = "localhost", port: int = 6379):
+        super().__init__(name=name, timeout_seconds=3.0, critical=True)
+        self._host = host
+        self._port = port
+
+    def check(self) -> HealthResult:
+        try:
+            r = redis.Redis(host=self._host, port=self._port, socket_timeout=2)
+            r.ping()
+            return HealthResult(
+                name=self.name,
+                status="healthy",
+                message=f"Redis reachable at {self._host}:{self._port}",
+                metadata={"host": self._host, "port": self._port},
+            )
+        except Exception as exc:
+            return HealthResult(
+                name=self.name,
+                status="unhealthy",
+                message=str(exc),
+                metadata={"host": self._host, "port": self._port},
+            )
+```
+
+---
+
+## Status Logic
+
+| Condition | System status |
+|-----------|--------------|
+| All checks pass | `healthy` |
+| Any non-critical check fails | `degraded` |
+| Any **critical** check fails | `unhealthy` |
+
+---
+
+## API Reference
+
+### `HealthResult`
+| Field | Type | Default |
+|-------|------|---------|
+| `name` | `str` | required |
+| `status` | `"healthy"\|"degraded"\|"unhealthy"` | required |
+| `message` | `str` | `""` |
+| `duration_ms` | `float` | `0.0` |
+| `metadata` | `dict` | `{}` |
+
+Properties: `is_healthy: bool`  
+Methods: `to_dict() -> dict`
+
+### `HealthCheck` (abstract)
+```python
+HealthCheck(name: str, timeout_seconds: float = 5.0, critical: bool = True)
+```
+Subclass and implement `check() -> HealthResult`.
+
+### `HealthRegistry`
+```python
+registry.register(check)          # add a check
+registry.unregister("name")       # remove by name
+registry.list_checks()            # -> list[str]
+registry.run_check("name")        # -> HealthResult
+registry.run_all(parallel=False)  # -> SystemHealth
+```
+
+### `SystemHealth`
+Properties: `healthy_count`, `degraded_count`, `unhealthy_count`, `critical_failures`  
+Methods: `to_dict() -> dict`
+
+### Built-in Checks
+| Check | Key params |
+|-------|-----------|
+| `HttpCheck` | `url`, `expected_status=200`, `timeout=5.0` |
+| `DiskSpaceCheck` | `path="/"`, `min_free_gb=1.0` |
+| `MemoryCheck` | `max_percent=90.0` (Linux only via `/proc/meminfo`) |
+| `LatencyCheck` | `func: callable`, `max_ms=1000.0` |
+
+---
+
+## License
+
+MIT
