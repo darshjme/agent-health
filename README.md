@@ -1,116 +1,103 @@
 <div align="center">
 
-<img src="assets/agent-health-hero.png" alt="agent-health — Vedic Arsenal by Darshankumar Joshi" width="100%" />
+<img src="assets/arogya-hero.png" alt="आरोग्य — arogya by Darshankumar Joshi" width="100%" />
 
-# 🔮 agent-health
+# 🌿 आरोग्य
+## `arogya`
 
-<h3><em>आरोग्य</em></h3>
+> *Charaka Samhita / Atharva Veda*
 
-> *Arogya — the Vedic science of system wellness*
+### Wellness — the Vedic science of vitality
 
-**Health checks and liveness monitoring for LLM agent systems — HTTP, disk, memory, latency checks with parallel execution. Zero dependencies.**
+**Health monitoring for agent components. HealthCheck, HealthMonitor, Uptime tracking. Zero dependencies.**
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=flat-square&logo=python)](https://python.org)
-[![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-brightgreen?style=flat-square)](https://github.com/darshjme/agent-health)
-[![Tests](https://img.shields.io/badge/Tests-Passing-success?style=flat-square)](https://github.com/darshjme/agent-health/actions)
-[![License](https://img.shields.io/badge/License-MIT-purple?style=flat-square)](LICENSE)
-[![Vedic Arsenal](https://img.shields.io/badge/Vedic%20Arsenal-100%20libs-purple?style=flat-square)](https://github.com/darshjme/arsenal)
+[![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-brightgreen?style=flat-square)](https://github.com/darshjme/arogya)
+[![Vedic Arsenal](https://img.shields.io/badge/Vedic%20Arsenal-100%20libs-green?style=flat-square)](https://github.com/darshjme/arsenal)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-*Part of the [**Vedic Arsenal**](https://github.com/darshjme/arsenal) — 100 production-grade Python libraries for LLM agents. Zero dependencies. Battle-tested.*
+*Formerly `agent-health` — Part of the [**Vedic Arsenal**](https://github.com/darshjme/arsenal): 100 production-grade Python libraries for LLM agents, each named from the Vedas, Puranas, and Mahakavyas.*
 
 </div>
 
 ---
 
-## Overview
+## The Vedic Principle
 
-`agent-health` implements **health checks and liveness monitoring for llm agent systems — http, disk, memory, latency checks with parallel execution. zero dependencies.**
+The ancient *Arogya* principle from Charaka Samhita / Atharva Veda finds its modern expression in this library.
 
-Inspired by the Vedic principle of *आरोग्य* (Arogya), this library brings the ancient wisdom of structured discipline to modern LLM agent engineering.
+Just as the Vedic sages understood that every phenomenon in the universe follows deep patterns — patterns of creation, maintenance, and dissolution — `arogya` applies this wisdom to LLM agent engineering.
 
-No external dependencies. Pure Python 3.8+. Drop it in anywhere.
+The concept of *आरोग्य* (Wellness — the Vedic science of vitality) speaks directly to the technical problem this library solves. When the sages codified this principle in Charaka Samhita / Atharva Veda, they were describing not just a spiritual truth but a computational truth that would take humanity millennia to rediscover in silicon.
 
-## Installation
+This is not coincidence. The universe has one nature. The Vedas described it first.
 
-```bash
-pip install agent-health
-```
-
-Or clone directly:
-```bash
-git clone https://github.com/darshjme/agent-health.git
-cd agent-health
-pip install -e .
-```
+---
 
 ## How It Works
 
 ```mermaid
-flowchart TD
-    A[agent-health] --> B[HTTP Check]
-    A --> C[Disk Check]
-    A --> D[Memory Check]
-    A --> E[Latency Check]
-    B & C & D & E --> F{All Healthy?}
-    F -- Yes --> G[HEALTHY]
-    F -- No --> H[DEGRADED / DOWN]
-    style A fill:#6b21a8,color:#fff
+flowchart LR
+    A[Input] --> B[arogya]
+    B --> C{Process}
+    C -- Success --> D[Output]
+    C -- Error --> E[Handle]
+    E --> B
+    style B fill:#6b21a8,color:#fff
+```
+
+---
+
+## Installation
+
+```bash
+pip install arogya
+```
+
+Or from source:
+```bash
+git clone https://github.com/darshjme/arogya.git
+cd arogya && pip install -e .
 ```
 
 ## Quick Start
 
 ```python
-from health import *
+from arogya import *
 
-# Initialize
-# See examples/ for full usage patterns
+# See examples/ for full usage
 ```
 
-## Why `agent-health`?
-
-Production LLM systems fail in predictable ways. `agent-health` solves the **health** failure mode with:
-
-- **Zero dependencies** — no version conflicts, no bloat
-- **Battle-tested patterns** — extracted from real production systems
-- **Type-safe** — full type hints, mypy-compatible
-- **Minimal surface area** — one job, done well
-- **Composable** — works with any LLM framework (LangChain, LlamaIndex, raw OpenAI, etc.)
+---
 
 ## The Vedic Arsenal
 
-`agent-health` is part of **[darshjme/arsenal](https://github.com/darshjme/arsenal)** — a collection of 100 focused Python libraries for LLM agent infrastructure.
+`arogya` is one of 100 libraries in **[darshjme/arsenal](https://github.com/darshjme/arsenal)** — each named from sacred Indian literature:
 
-Each library solves exactly one problem. Together they form a complete stack.
+| Sanskrit Name | Source | Technical Function |
+|---|---|---|
+| `arogya` | Charaka Samhita / Atharva Veda | Wellness — the Vedic science of vitality |
 
-```
-pip install agent-health  # this library
-# Browse all 100: https://github.com/darshjme/arsenal
-```
+Each library solves one problem. Zero external dependencies. Pure Python 3.8+.
+
+---
 
 ## Contributing
 
-Found a bug? Have an improvement?
-
 1. Fork the repo
-2. Create a feature branch (`git checkout -b fix/your-fix`)
-3. Add tests
+2. Create feature branch (`git checkout -b fix/your-fix`)  
+3. Add tests — zero dependencies only
 4. Open a PR
-
-All contributions welcome. Keep it zero-dependency.
-
-## License
-
-MIT — use freely, build freely.
 
 ---
 
 <div align="center">
 
-**Built with 🔮 by [Darshankumar Joshi](https://github.com/darshjme)** · [@thedarshanjoshi](https://twitter.com/thedarshanjoshi)
+**🌿 Built by [Darshankumar Joshi](https://github.com/darshjme)** · [@thedarshanjoshi](https://twitter.com/thedarshanjoshi)
 
 *"कर्मण्येवाधिकारस्ते मा फलेषु कदाचन"*
-*Your right is to action alone, never to the fruits thereof.*
+*Your right is to action alone, never to its fruits. — Bhagavad Gita 2.47*
 
-[Arsenal](https://github.com/darshjme/arsenal) · [GitHub](https://github.com/darshjme) · [Twitter](https://twitter.com/thedarshanjoshi)
+[Vedic Arsenal](https://github.com/darshjme/arsenal) · [GitHub](https://github.com/darshjme) · [Twitter](https://twitter.com/thedarshanjoshi)
 
 </div>
