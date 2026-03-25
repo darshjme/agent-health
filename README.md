@@ -1,10 +1,12 @@
 <div align="center">
 
-<img src="assets/agent-health-hero.png" alt="agent-health — Vedic Arsenal" width="100%" />
+<img src="assets/agent-health-hero.png" alt="agent-health — Vedic Arsenal by Darshankumar Joshi" width="100%" />
 
 # 🔮 agent-health
 
-### *आरोग्य* — Arogya — the Vedic science of system wellness
+<h3><em>आरोग्य</em></h3>
+
+> *Arogya — the Vedic science of system wellness*
 
 **Health checks and liveness monitoring for LLM agent systems — HTTP, disk, memory, latency checks with parallel execution. Zero dependencies.**
 
@@ -39,6 +41,20 @@ Or clone directly:
 git clone https://github.com/darshjme/agent-health.git
 cd agent-health
 pip install -e .
+```
+
+## How It Works
+
+```mermaid
+flowchart TD
+    A[agent-health] --> B[HTTP Check]
+    A --> C[Disk Check]
+    A --> D[Memory Check]
+    A --> E[Latency Check]
+    B & C & D & E --> F{All Healthy?}
+    F -- Yes --> G[HEALTHY]
+    F -- No --> H[DEGRADED / DOWN]
+    style A fill:#6b21a8,color:#fff
 ```
 
 ## Quick Start
@@ -90,7 +106,7 @@ MIT — use freely, build freely.
 
 <div align="center">
 
-**Built with 🔮 by [Darshankumar Joshi](https://github.com/darshjme)**
+**Built with 🔮 by [Darshankumar Joshi](https://github.com/darshjme)** · [@thedarshanjoshi](https://twitter.com/thedarshanjoshi)
 
 *"कर्मण्येवाधिकारस्ते मा फलेषु कदाचन"*
 *Your right is to action alone, never to the fruits thereof.*
